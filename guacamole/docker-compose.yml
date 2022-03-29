@@ -1,0 +1,45 @@
+version: '3'
+
+networks:
+    default:
+        external:
+            name: npmnetwork
+
+services:
+
+    guacd:
+        image: guacamole/guacd
+        restart: unless-stopped
+        volumes:
+            - ./guacd-drive:/drive
+            - ./guacd-record:/record
+
+    mariadb:
+        image: mariadb
+        restart: unless-stopped
+        volumes:
+            - ./mariadb-data:/var/lib/mysql/
+            - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+        environment:
+            - MARIADB_ROOT_PASSWORD=iXdSLAbrmD
+            - MARIADB_DATABASE=guacamole
+            - MARIADB_USER=guacamole
+            - MARIADB_PASSWORD=iXdSLAbrmD
+
+    guacamole:
+        image: guacamole/guacamole
+        links:
+            - guacd
+        expose:
+            - 8080
+        restart: unless-stopped
+        depends_on:
+            - guacd
+            - mariadb
+        environment:
+            - GUACD_HOSTNAME=guacd
+            - MYSQL_HOSTNAME=mariadb
+            - MYSQL_DATABASE=guacamole
+            - MYSQL_USER=guacamole
+            - MYSQL_PASSWORD=iXdSLAbrmD
+

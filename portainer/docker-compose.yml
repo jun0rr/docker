@@ -1,0 +1,19 @@
+version: '3'
+services:
+
+  portainer:
+    image: portainer/portainer
+    privileged: true
+    ports:
+      - "127.0.0.1:9443:9443"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - './data:/data'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    restart: unless-stopped
+
+networks:
+  default:
+    external:
+      name: npmnetwork
